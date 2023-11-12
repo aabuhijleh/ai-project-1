@@ -47,7 +47,7 @@ export default function Knapsack() {
   return (
     <main className="min-h-screen flex flex-col items-center p-14">
       <div className="lg:w-[800px]">
-        <h1 className="text-4xl mb-12">Knapsack</h1>
+        <h1 className="text-4xl mb-12 font-semibold">Knapsack</h1>
 
         <div className="max-w-xs mb-6">
           <form onSubmit={handleCapacityChanged}>

@@ -358,7 +358,7 @@ export class Game extends React.Component {
         <header className='text-2xl text-center my-6 p-4 bg-slate-800 rounded font-bold'>
           {gameStatus}
         </header>
-        <div className='border-4 border-zinc-500 rounded'>
+        <div className='border-4 border-slate-500 rounded'>
           <Board
             boardState={boardState}
             currentPlayer={currentPlayer}
@@ -388,7 +388,7 @@ export class Game extends React.Component {
 
           <Button
             className='w-32'
-            variant='secondary'
+            variant='destructive'
             size='default'
             onClick={() => this.reset()}
             disabled={this.state.stepNumber < 1}

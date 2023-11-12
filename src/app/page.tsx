@@ -10,7 +10,7 @@ export default function Home() {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <p className="fixed left-0 top-0 flex items-center gap-2 w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
+        <p className="fixed left-0 top-0 flex items-center gap-2 w-full justify-center border-b border-gray-300 bg-gradient-to-b from-slate-200 pb-6 pt-8 backdrop-blur-2xl dark:border-slate-800 dark:bg-slate-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-slate-800/30">
           Made by Abdurrahman Abu-Hijleh <GithubIcon size={14} />
         </p>
       </a>
@@ -22,7 +22,7 @@ export default function Home() {
       <div className="mt-12 mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:mt-0">
         <Link
           href="/knapsack"
-          className="flex flex-col items-center group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          className="flex flex-col items-center group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-slate-700 hover:dark:bg-slate-800/30"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Knapsack{" "}
@@ -37,7 +37,7 @@ export default function Home() {
 
         <Link
           href="/checkers"
-          className="flex flex-col items-center justify-center group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
+          className="flex flex-col items-center justify-center group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-slate-700 hover:dark:bg-slate-800/30"
         >
           <h2 className={`mb-3 text-2xl font-semibold`}>
             Checkers{" "}
