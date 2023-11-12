@@ -1,0 +1,53 @@
+.board-col {
+  display: inline-block;
+  max-width: 50px;
+}
+
+.square {
+  background: no-repeat #fff;
+  border: none;
+  height: 50px;
+  width: 50px;
+  padding: 5px;
+  background-origin: content-box;
+  background-size: contain;
+}
+
+.isActive {
+  background-color: wheat;
+}
+
+.square.movable.player1-move {
+  background-color: #ff6347;
+}
+
+.square.movable.player2-move {
+  background-color: #7fffd4;
+}
+
+.square.player1,
+.square.player2,
+.square.movable {
+  cursor: pointer;
+}
+
+.square.white {
+  background-color: #fff;
+}
+
+.square.black {
+  background-color: #262626;
+}
+
+.square.player1 {
+  background-image: url("img/red-pawn.png");
+}
+.square.player2 {
+  background-image: url("img/blue-pawn.png");
+}
+.square.player1.king {
+  background-image: url("img/red-king.png");
+}
+.square.player2.king {
+  background-image: url("img/blue-king.png");
+}
