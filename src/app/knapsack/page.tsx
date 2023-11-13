@@ -1,19 +1,20 @@
 "use client";
 
-import { useReducer } from "react";
-import { getColumns } from "./columns";
-import { DataTable } from "./data-table";
+import { useReducer, useState } from "react";
+import { getColumns } from "./constants/columns";
+import { DataTable } from "./components/data-table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Calculator } from "lucide-react";
-import { DEFAULT_ITEMS } from "./data";
-import { Knapsack, Action } from "./types";
+import { DEFAULT_ITEMS } from "./constants/data";
+import { Knapsack, Action, Solution } from "./types";
 import { solve } from "./logic";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
+import { TemperatureChart, ValueChart } from "./components/charts";
 
 const INITIAL_STATE: Knapsack = {
-  capacity: 101,
+  capacity: 100,
   items: DEFAULT_ITEMS,
 };
 
@@ -26,7 +27,7 @@ const knapsackReducer = (state: Knapsack, action: Action): Knapsack => {
     case "DELETE_ITEM":
       return {
         ...state,
-        items: state.items.filter((item) => item.id !== action.payload),
+        items: state.items.filter((item) => item?.id !== action.payload),
       };
     default:
       return state;
@@ -35,6 +36,7 @@ const knapsackReducer = (state: Knapsack, action: Action): Knapsack => {
 
 export default function Knapsack() {
   const [knapsack, dispatch] = useReducer(knapsackReducer, INITIAL_STATE);
+  const [solution, setSolution] = useState<Solution | null>(null);
   const { toast } = useToast();
 
   const handleCapacityChanged = (e: React.FormEvent<HTMLFormElement>) => {
@@ -63,13 +65,14 @@ export default function Knapsack() {
     form.reset();
   };
 
-  const handleItemDeleted = (id: string) => {
+  const handleItemDeleted = (id?: string) => {
     dispatch({ type: "DELETE_ITEM", payload: id });
   };
 
   const handleSolve = () => {
     try {
-      solve(knapsack);
+      const solution = solve(knapsack);
+      setSolution(solution);
     } catch (error) {
       toast({
         title: (error as Error).message,
@@ -137,7 +140,43 @@ export default function Knapsack() {
             <Calculator size={16} /> Solve
           </Button>
         </div>
+
+        {solution && (
+          <div>
+            <div className="mt-6 p-6 border border-slate-700 bg-slate-800/30 rounded-xl">
+              <p className="mb-4 text-xl">
+                Total Value:{" "}
+                <span className="text-green-400">{solution.value}</span>
+              </p>
+              <p className="mb-4 text-xl">
+                Total Weight:{" "}
+                <span className="text-green-400">{solution.weight}</span>
+              </p>
+              <p className="mb-4 text-xl">
+                Selected Items:{" "}
+                <span className="text-green-400">{solution.items.length}</span>
+              </p>
+
+              <DataTable
+                className="mb-4"
+                columns={getColumns({ includeActions: false })}
+                data={solution.items}
+              />
+
+              <div className="flex flex-col items-center justify-center">
+                <h3 className="text-xl mb-2">Temperature</h3>
+                <TemperatureChart data={solution.metadata.temperature} />
+              </div>
+
+              <div className="flex flex-col items-center justify-center">
+                <h3 className="text-xl mb-2">Value</h3>
+                <ValueChart data={solution.metadata.value} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
       <Toaster />
     </main>
   );

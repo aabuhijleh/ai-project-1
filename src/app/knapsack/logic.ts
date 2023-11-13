@@ -1,4 +1,4 @@
-import { Item, Knapsack } from "./types";
+import { Item, Knapsack, Metadata, Solution } from "./types";
 import clone from "lodash.clone";
 
 /**
@@ -8,27 +8,25 @@ import clone from "lodash.clone";
  */
 export const solve = (
   initialState: Knapsack,
-  initialTemp: number = 10000,
-  minTemp: number = 1,
-  interval: number = 100
-) => {
-  // Check if there is at least one item that can fit into the knapsack
-  if (
-    !initialState.items.some(
-      (item) => (item?.weight || 0) <= initialState.capacity
-    ) ||
-    initialState.items.length === 0
-  ) {
-    throw new Error("Uh Oh! No items can fit into the knapsack");
-  }
+  initialTemp: number = 1000,
+  minTemp: number = 0.01,
+  alpha: number = 0.99,
+  interval: number = 50
+): Solution => {
+  validateInput(initialState);
 
   let currentSolution = clone(initialState);
   let bestSolution = clone(currentSolution);
   let temperature = initialTemp;
 
+  const metadata: Metadata = {
+    temperature: [{ label: "Temperature", data: [] }],
+    value: [{ label: "Value", data: [] }],
+  };
+
   let i = 0;
   while (true) {
-    temperature *= 0.99; // Cooling schedule: reduce temperature by 1% each iteration
+    temperature *= alpha; // Cooling schedule: reduce temperature each iteration
 
     const newSolution = randomSuccessor(currentSolution, initialState.items);
     const deltaE =
@@ -41,20 +39,14 @@ export const solve = (
       ) {
         bestSolution = clone(currentSolution);
       }
-    } else if (Math.exp(-deltaE / temperature) > Math.random()) {
+    } else if (Math.exp(deltaE / temperature) > Math.random()) {
       currentSolution = newSolution;
     }
 
     if (i % interval === 0) {
       const value = objectiveFunction(currentSolution);
-      console.log(
-        "iteration:",
-        i,
-        "value:",
-        value,
-        "temperature:",
-        temperature
-      );
+      metadata.temperature[0].data.push({ iteration: i, temperature });
+      metadata.value[0].data.push({ iteration: i, value });
     }
 
     if (temperature <= minTemp) {
@@ -63,17 +55,28 @@ export const solve = (
     i++;
   }
 
-  console.log("Iterations:", i);
-
   const { totalValue, totalWeight } = calculateTotal(bestSolution.items);
   const result = {
     value: totalValue,
     weight: totalWeight,
-    items: bestSolution.items,
+    items: bestSolution.items.filter(Boolean),
+    metadata,
   };
 
-  console.log("Best solution found:", result);
   return result;
+};
+
+// Check if there is at least one item that can fit into the knapsack
+const validateInput = (knapsack: Knapsack) => {
+  if (
+    knapsack.capacity <= 0 ||
+    knapsack.items.length === 0 ||
+    !knapsack.items.some(
+      (item) => (item?.weight || Infinity) <= knapsack.capacity
+    )
+  ) {
+    throw new Error("Uh Oh! No items can fit into the knapsack");
+  }
 };
 
 // Return a knapsack configuration with one item changed
