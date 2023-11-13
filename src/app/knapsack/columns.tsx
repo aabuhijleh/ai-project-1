@@ -3,13 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
 import { Trash2 } from "lucide-react";
-
-export type Item = {
-  id: string;
-  name: string;
-  weight: number;
-  value: number;
-};
+import { Item } from "./types";
 
 type getColumnsParams = {
   onRowDeleted: (id: string) => void;
@@ -31,6 +25,7 @@ export const getColumns = ({ onRowDeleted }: getColumnsParams) => {
     },
     {
       accessorKey: "actions",
+      header: "Actions",
       cell: ({ row }) => {
         const item = row.original;
         return (

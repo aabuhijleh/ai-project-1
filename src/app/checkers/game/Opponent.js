@@ -1,143 +1,150 @@
-import {ReactCheckers} from './ReactCheckers.js';
+import { ReactCheckers } from './ReactCheckers.js'
 
 export class Opponent extends ReactCheckers {
+  getComputerMoves (boardState, player) {
+    const self = this
+    let computerMoves = {}
 
-    getComputerMoves(boardState, player) {
-        const self = this;
-        let computerMoves = {};
+    for (const coordinates in boardState) {
+      if (!boardState.hasOwnProperty(coordinates)) {
+        continue
+      }
 
-        for (const coordinates in boardState) {
-            if (!boardState.hasOwnProperty(coordinates)) {
-                continue;
-            }
+      const currentSquare = boardState[coordinates]
 
-            const currentSquare = boardState[coordinates];
+      if (currentSquare == null) {
+        continue
+      }
 
-            if (currentSquare == null) {
-                continue;
-            }
+      if (currentSquare.player !== player) {
+        continue
+      }
 
-            if (currentSquare.player !== player) {
-                continue;
-            }
+      const pieceMoves = self.getMoves(
+        boardState,
+        coordinates,
+        boardState[coordinates].isKing,
+        false
+      )
 
-            const pieceMoves = self.getMoves(boardState, coordinates, boardState[coordinates].isKing, false);
-
-            if (pieceMoves[0].length > 0 || pieceMoves[1] !== null) {
-                computerMoves[coordinates] = pieceMoves;
-            }
-        }
-
-        return computerMoves;
+      if (pieceMoves[0].length > 0 || pieceMoves[1] !== null) {
+        computerMoves[coordinates] = pieceMoves
+      }
     }
 
-    getSmartMove(state, boardState, player) {
-        const computerMoves = this.getComputerMoves(boardState, player);
+    return computerMoves
+  }
 
-        const moveKeys = Object.keys(computerMoves);
+  getSmartMove (state, boardState, player) {
+    const computerMoves = this.getComputerMoves(boardState, player)
 
-        const superMoves = {};
+    const moveKeys = Object.keys(computerMoves)
 
-        // Pieces
-        for (let m = 0; m < moveKeys.length ; ++m) {
-            const piece = moveKeys[m];
+    const superMoves = {}
 
-            const movesData = computerMoves[piece][0];
-            const jumpKills = computerMoves[piece][1];
+    // Pieces
+    for (let m = 0; m < moveKeys.length; ++m) {
+      const piece = moveKeys[m]
 
-            const jumpMoves = [];
+      const movesData = computerMoves[piece][0]
+      const jumpKills = computerMoves[piece][1]
 
-            for (const jumpCoordinates in jumpKills) {
-                if (!jumpKills.hasOwnProperty(jumpCoordinates)) {
-                    continue;
-                }
-                jumpMoves.push(jumpKills[jumpCoordinates]);
-            }
+      const jumpMoves = []
 
-            let highestScore = 0;
-            let bestMove = null;
+      for (const jumpCoordinates in jumpKills) {
+        if (!jumpKills.hasOwnProperty(jumpCoordinates)) {
+          continue
+        }
+        jumpMoves.push(jumpKills[jumpCoordinates])
+      }
 
-            // Piece moves
-            for (let a = 0; a < movesData.length ; ++a) {
+      let highestScore = 0
+      let bestMove = null
 
-                const moveTo = movesData[a];
+      // Piece moves
+      for (let a = 0; a < movesData.length; ++a) {
+        const moveTo = movesData[a]
 
-                let score = 0;
+        let score = 0
 
-                // let boardStateLeaf = Object.assign({}, boardstate);
-                let stateLeaf = Object.assign({}, state);
+        // let boardStateLeaf = Object.assign({}, boardstate);
+        let stateLeaf = Object.assign({}, state)
 
-                stateLeaf.activePiece = piece;
-                stateLeaf.moves = movesData;
-                stateLeaf.jumpKills = jumpKills;
+        stateLeaf.activePiece = piece
+        stateLeaf.moves = movesData
+        stateLeaf.jumpKills = jumpKills
 
-                if (jumpMoves.indexOf(moveTo) > -1) {
-                    score += 10;
-                }
-
-                while (stateLeaf.currentPlayer === false) {
-
-                    const newJumpMoves = this.getMoves(stateLeaf, stateLeaf.activePiece, stateLeaf.activePiece.isKing, true);
-
-                    stateLeaf.moves = newJumpMoves[0];
-                    stateLeaf.jumpKills = newJumpMoves[1];
-
-                    score += 10;
-                }
-
-                if (score >= highestScore) {
-                    highestScore = score;
-                    bestMove = moveTo;
-                }
-            }
-
-            superMoves[piece] = [bestMove, highestScore];
+        if (jumpMoves.indexOf(moveTo) > -1) {
+          score += 10
         }
 
-        let finalMove = [];
-        let highestAllMoves = 0;
+        while (stateLeaf.currentPlayer === false) {
+          const newJumpMoves = this.getMoves(
+            stateLeaf,
+            stateLeaf.activePiece,
+            stateLeaf.activePiece.isKing,
+            true
+          )
 
-        for (let pieces in superMoves) {
-            if (!superMoves.hasOwnProperty(pieces)) {
-                continue;
-            }
+          stateLeaf.moves = newJumpMoves[0]
+          stateLeaf.jumpKills = newJumpMoves[1]
 
-            const pieceMove = superMoves[pieces][0];
-            const moveScore = superMoves[pieces][1];
-
-            if (moveScore >= highestAllMoves) {
-                if (moveScore === highestAllMoves) {
-                    finalMove.push([pieces, pieceMove]);
-                }
-                if (moveScore > highestAllMoves) {
-                    finalMove = [];
-                    finalMove.push([pieces, pieceMove]);
-                    highestAllMoves = moveScore;
-                }
-            }
+          score += 10
         }
 
-        const chooseMove = finalMove[Math.floor(Math.random()*finalMove.length)];
+        if (score >= highestScore) {
+          highestScore = score
+          bestMove = moveTo
+        }
+      }
 
-        const out = {};
-        out.piece = chooseMove[0];
-        out.moveTo = chooseMove[1];
-
-        return out;
+      superMoves[piece] = [bestMove, highestScore]
     }
 
-    getRandomMove(boardState, player) {
-        const computerMoves = this.getComputerMoves(boardState, player);
-        const keys = Object.keys(computerMoves);
-        const randomPiece = keys[Math.floor(Math.random() * keys.length)];
+    let finalMove = []
+    let highestAllMoves = 0
 
-        const movesData    = computerMoves[randomPiece][0];
-        const randomMoveTo = movesData[Math.floor(Math.random()*movesData.length)];
+    for (let pieces in superMoves) {
+      if (!superMoves.hasOwnProperty(pieces)) {
+        continue
+      }
 
-        let out = {};
-        out.piece = randomPiece;
-        out.moveTo = randomMoveTo;
+      const pieceMove = superMoves[pieces][0]
+      const moveScore = superMoves[pieces][1]
 
-        return out;
+      if (moveScore >= highestAllMoves) {
+        if (moveScore === highestAllMoves) {
+          finalMove.push([pieces, pieceMove])
+        }
+        if (moveScore > highestAllMoves) {
+          finalMove = []
+          finalMove.push([pieces, pieceMove])
+          highestAllMoves = moveScore
+        }
+      }
     }
+
+    const chooseMove = finalMove[Math.floor(Math.random() * finalMove.length)]
+
+    const out = {}
+    out.piece = chooseMove[0]
+    out.moveTo = chooseMove[1]
+
+    return out
+  }
+
+  getRandomMove (boardState, player) {
+    const computerMoves = this.getComputerMoves(boardState, player)
+    const keys = Object.keys(computerMoves)
+    const randomPiece = keys[Math.floor(Math.random() * keys.length)]
+
+    const movesData = computerMoves[randomPiece][0]
+    const randomMoveTo = movesData[Math.floor(Math.random() * movesData.length)]
+
+    let out = {}
+    out.piece = randomPiece
+    out.moveTo = randomMoveTo
+
+    return out
+  }
 }
