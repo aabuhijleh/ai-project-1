@@ -8,9 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Plus, Calculator } from "lucide-react";
 import { DEFAULT_ITEMS } from "./data";
 import { Knapsack, Action } from "./types";
+import { solve } from "./logic";
+import { Toaster } from "@/components/ui/toaster";
+import { useToast } from "@/components/ui/use-toast";
 
 const INITIAL_STATE: Knapsack = {
-  capacity: 10,
+  capacity: 101,
   items: DEFAULT_ITEMS,
 };
 
@@ -32,6 +35,7 @@ const knapsackReducer = (state: Knapsack, action: Action): Knapsack => {
 
 export default function Knapsack() {
   const [knapsack, dispatch] = useReducer(knapsackReducer, INITIAL_STATE);
+  const { toast } = useToast();
 
   const handleCapacityChanged = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,6 +65,20 @@ export default function Knapsack() {
 
   const handleItemDeleted = (id: string) => {
     dispatch({ type: "DELETE_ITEM", payload: id });
+  };
+
+  const handleSolve = () => {
+    try {
+      solve(knapsack);
+    } catch (error) {
+      toast({
+        title: (error as Error).message,
+        description: "Please adjust capacity or items",
+        variant: "destructive",
+        duration: 5000,
+      });
+      console.error(error);
+    }
   };
 
   return (
@@ -115,11 +133,12 @@ export default function Knapsack() {
         </div>
 
         <div className="flex justify-center">
-          <Button className="flex gap-2" size="lg">
+          <Button className="flex gap-2" size="lg" onClick={handleSolve}>
             <Calculator size={16} /> Solve
           </Button>
         </div>
       </div>
+      <Toaster />
     </main>
   );
 }
