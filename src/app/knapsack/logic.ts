@@ -43,6 +43,7 @@ export const solve = (
       currentSolution = newSolution;
     }
 
+    // Capture data at regular intervals to aid visualization
     if (i % interval === 0) {
       const value = objectiveFunction(currentSolution);
       metadata.temperature[0].data.push({ iteration: i, temperature });
