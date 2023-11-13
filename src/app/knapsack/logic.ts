@@ -8,12 +8,15 @@ import clone from "lodash.clone";
  */
 export const solve = (
   initialState: Knapsack,
-  iterMax: number = 1000,
-  initialTemp: number = 10000
+  initialTemp: number = 10000,
+  minTemp: number = 1,
+  interval: number = 100
 ) => {
   // Check if there is at least one item that can fit into the knapsack
   if (
-    !initialState.items.some((item) => item.weight <= initialState.capacity) ||
+    !initialState.items.some(
+      (item) => (item?.weight || 0) <= initialState.capacity
+    ) ||
     initialState.items.length === 0
   ) {
     throw new Error("Uh Oh! No items can fit into the knapsack");
@@ -23,7 +26,8 @@ export const solve = (
   let bestSolution = clone(currentSolution);
   let temperature = initialTemp;
 
-  for (let i = 0; i < iterMax; i++) {
+  let i = 0;
+  while (true) {
     temperature *= 0.99; // Cooling schedule: reduce temperature by 1% each iteration
 
     const newSolution = randomSuccessor(currentSolution, initialState.items);
@@ -40,7 +44,26 @@ export const solve = (
     } else if (Math.exp(-deltaE / temperature) > Math.random()) {
       currentSolution = newSolution;
     }
+
+    if (i % interval === 0) {
+      const value = objectiveFunction(currentSolution);
+      console.log(
+        "iteration:",
+        i,
+        "value:",
+        value,
+        "temperature:",
+        temperature
+      );
+    }
+
+    if (temperature <= minTemp) {
+      break;
+    }
+    i++;
   }
+
+  console.log("Iterations:", i);
 
   const { totalValue, totalWeight } = calculateTotal(bestSolution.items);
   const result = {
@@ -58,32 +81,15 @@ const randomSuccessor = (
   knapsack: Knapsack,
   availableItems: Item[]
 ): Knapsack => {
-  const items = knapsack.items;
-  let newItemSet = new Set(items);
-
-  // Randomly add or remove an item
-  const changeType = Math.random() < 0.5 ? "remove" : "add";
-  if (changeType === "remove" && newItemSet.size > 0) {
-    const itemsArray = Array.from(newItemSet);
-    newItemSet.delete(
-      itemsArray[Math.floor(Math.random() * itemsArray.length)]
-    );
+  const items = [...knapsack.items];
+  const randomIndex = Math.floor(Math.random() * items.length);
+  if (items[randomIndex] === null) {
+    items[randomIndex] = availableItems[randomIndex];
   } else {
-    // Filter out the items already in the knapsack
-    const itemsNotInKnapsack = availableItems.filter(
-      (item) => !newItemSet.has(item)
-    );
-
-    if (itemsNotInKnapsack.length > 0) {
-      const itemToAdd =
-        itemsNotInKnapsack[
-          Math.floor(Math.random() * itemsNotInKnapsack.length)
-        ];
-      newItemSet.add(itemToAdd);
-    }
+    items[randomIndex] = null;
   }
 
-  return { ...knapsack, items: Array.from(newItemSet) };
+  return { ...knapsack, items: items };
 };
 
 // Calculate total value, return 0 or a negative value if weight exceeds capacity
@@ -94,8 +100,8 @@ const objectiveFunction = (knapsack: Knapsack): number => {
 };
 
 const calculateTotal = (items: Item[]) => {
-  const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
-  const totalValue = items.reduce((sum, item) => sum + item.value, 0);
+  const totalWeight = items.reduce((sum, item) => sum + (item?.weight || 0), 0);
+  const totalValue = items.reduce((sum, item) => sum + (item?.value || 0), 0);
 
   return { totalWeight, totalValue };
 };

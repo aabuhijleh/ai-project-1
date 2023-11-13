@@ -8,7 +8,7 @@ export type Item = {
   name: string;
   weight: number;
   value: number;
-};
+} | null;
 
 export type Action =
   | { type: "SET_CAPACITY"; payload: number }
