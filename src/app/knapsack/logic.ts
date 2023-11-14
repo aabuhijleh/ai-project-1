@@ -96,7 +96,7 @@ const randomSuccessor = (
   return { ...knapsack, items: items };
 };
 
-// Calculate total value, return 0 or a negative value if weight exceeds capacity
+// Calculate total value, return 0 if weight exceeds capacity
 const objectiveFunction = (knapsack: Knapsack): number => {
   const { totalWeight, totalValue } = calculateTotal(knapsack.items);
 
