@@ -54,7 +54,7 @@ src/app/knapsack
 | `page.tsx`     | Main Application Interface      | Hosts the GUI of the app.                                                                                                                            |
 | `types.ts`     | Type Definitions and Interfaces | Contains type definitions and interfaces used across the application, centralizing the app's data typing.                                            |
 
-### State Representation
+### Problem Representation
 
 ```ts
 export type Knapsack = {
@@ -63,7 +63,6 @@ export type Knapsack = {
 };
 
 export type Item = {
-  id: string;
   name: string;
   weight: number;
   value: number;
@@ -83,7 +82,7 @@ Function SolveKnapsack:
     4. Set temperature to initialTemp
 
     5. While true:
-        a. Multiply the temperature by alpha (cooling schedule)
+        a. Multiply the temperature by alpha (cooling schedule: lower the probability of accepting a worse solution)
         b. Generate newSolution as a random successor of currentSolution
         c. Calculate deltaE as the difference in objective function values between newSolution and currentSolution
 
@@ -107,7 +106,7 @@ End Function
 
 > 🚧 Still a work in progress
 
-![checkers example](./images/checkers.png)
+<img src="./images/checkers.png" alt="checkers example" width="400"/>
 
 ## 🌟 Credits
 
