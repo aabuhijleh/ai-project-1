@@ -27,6 +27,12 @@ $ npm run dev
 
 ## 💰 Knapsack Problem Solver
 
+The [knapsack problem](https://en.wikipedia.org/wiki/Knapsack_problem) is the following problem in combinatorial optimization:
+
+> Given a set of items, each with a weight and a value, determine which items to include in the collection so that the total weight is less than or equal to a given limit and the total value is as large as possible.
+
+We'll tackle the problem using the [Simulated Annealing](https://en.wikipedia.org/wiki/Simulated_annealing) technique.
+
 ![knapsack example](./images/knapsack.png)
 
 ### File Structure
