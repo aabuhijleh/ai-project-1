@@ -7,7 +7,7 @@ Project for NNU Artificial Intelligence course
 ## ✨ Features
 
 - Knapsack Problem Solver using Simulated Annealing
-- Checkers Game with Alpha-Beta Algorithm
+- 🚧 Checkers Game with Alpha-Beta Algorithm _(Still a work in progress)_
 
 ## ⚡ How to use?
 
